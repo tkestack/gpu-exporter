@@ -659,6 +659,32 @@ func (h handle) deviceGetAllRunningProcesses() ([]ProcessInfo, error) {
 	return processInfo, nil
 }
 
+// TODO: kxie
+func (h handle) deviceGetProcessUtilization() ([]ProcessUtilizationSample, error) {
+	var procs [1024]C.nvmlProcessUtilizationSample_t
+	var count = C.uint(1024)
+	r := C.nvmlDeviceGetProcessUtilization(h.dev, &procs[0], &count, C.ulonglong(0))
+	if r == C.NVML_ERROR_NOT_SUPPORTED {
+		return nil, nil
+	}
+
+	n := int(count)
+	var pids []ProcessUtilizationSample
+	for i := 0; i < n; i++ {
+		pid := uint(procs[i].pid)
+		if pid != 0 {
+			pids = append(pids, ProcessUtilizationSample{
+				PID:     uint(procs[i].pid),
+				SmUtil:  uint(procs[i].smUtil),
+				MemUtil: uint(procs[i].memUtil),
+				EncUtil: uint(procs[i].encUtil),
+				DecUtil: uint(procs[i].decUtil),
+			})
+		}
+	}
+	return pids, errorString(r)
+}
+
 func (h handle) getClocksThrottleReasons() (reason ThrottleReason, err error) {
 	var clocksThrottleReasons C.ulonglong
 

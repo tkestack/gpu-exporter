@@ -272,6 +272,14 @@ type ProcessInfo struct {
 	Type       ProcessType
 }
 
+type ProcessUtilizationSample struct {
+	PID     uint
+	SmUtil  uint
+	DecUtil uint
+	EncUtil uint
+	MemUtil uint
+}
+
 type DeviceStatus struct {
 	Power       *uint
 	FanSpeed    *uint
@@ -667,6 +675,11 @@ func (d *Device) GetGraphicsRunningProcesses() ([]uint, []uint64, error) {
 
 func (d *Device) GetAllRunningProcesses() ([]ProcessInfo, error) {
 	return d.handle.deviceGetAllRunningProcesses()
+}
+
+// TODO: kxie
+func (d *Device) GetAllProcessesUtilization() ([]ProcessUtilizationSample, error) {
+	return d.handle.deviceGetProcessUtilization()
 }
 
 func (d *Device) GetDeviceMode() (mode *DeviceMode, err error) {
