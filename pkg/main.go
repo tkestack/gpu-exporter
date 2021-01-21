@@ -24,6 +24,7 @@ import (
 	"time"
 
 	"github.com/NVIDIA/gpu-monitoring-tools/bindings/go/dcgm"
+	"github.com/NVIDIA/gpu-monitoring-tools/bindings/go/nvml"
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 )
@@ -98,6 +99,13 @@ restart:
 
 	cleanup, err := dcgm.Init(dcgm.Embedded)
 	defer cleanup()
+	if err != nil {
+		logrus.Fatal(err)
+	}
+	logrus.Info("DCGM successfully initialized!")
+
+	nvmlCleanup, err := nvml.InitCounter()
+	defer nvmlCleanup()
 	if err != nil {
 		logrus.Fatal(err)
 	}
