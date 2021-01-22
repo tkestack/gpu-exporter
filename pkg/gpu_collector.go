@@ -27,6 +27,19 @@ func NewDCGMCollector(c []Counter) (*DCGMCollector, func(), error) {
 		DeviceFields: NewDeviceFields(c),
 	}
 
+	count, err := dcgm.GetAllDeviceCount()
+	if err != nil {
+		return nil, func() {}, err
+	}
+
+	for i := uint(0); i < count; i++ {
+		deviceInfo, err := dcgm.GetDeviceInfo(i)
+		if err != nil {
+			return nil, func() {}, err
+		}
+		collector.DeviceList = append(collector.DeviceList, deviceInfo)
+	}
+
 	cleanups, err := SetupDcgmFieldsWatch(collector.DeviceFields)
 	if err != nil {
 		return nil, func() {}, err

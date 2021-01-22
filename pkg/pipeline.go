@@ -48,6 +48,8 @@ func NewMetricsPipeline(c *Config) (*MetricsPipeline, func(), error) {
 	if c.Kubernetes {
 		transformations = append(transformations, NewPodMapper(c))
 	}
+	// TODO: kxie
+	transformations = append(transformations, NewCgroupMapper(gpuCollector.DeviceList))
 
 	return &MetricsPipeline{
 			config: c,
@@ -116,8 +118,15 @@ func (m *MetricsPipeline) run() (string, error) {
 		return "", fmt.Errorf("Failed to collect metrics with error: %v", err)
 	}
 
+	var container []ContainerMetric
+
 	for _, transform := range m.transformations {
 		err := transform.Process(metrics)
+		if err != nil {
+			return "", fmt.Errorf("Failed to transform metrics for transorm %s: %v", err, transform.Name())
+		}
+
+		container, err = transform.K8sProcess()
 		if err != nil {
 			return "", fmt.Errorf("Failed to transform metrics for transorm %s: %v", err, transform.Name())
 		}
@@ -128,7 +137,15 @@ func (m *MetricsPipeline) run() (string, error) {
 		return "", fmt.Errorf("Failed to format metrics with error: %v", err)
 	}
 
-	return formated, nil
+	sep := `
+`
+
+	//TODO: kxie
+	containerFormat, err := FormatContainerMetrics(container)
+	if err != nil {
+		return "", fmt.Errorf("Failed to format container metrics with error: %v", err)
+	}
+	return formated + sep + containerFormat, nil
 }
 
 /*
@@ -184,4 +201,40 @@ func FormatMetrics(countersText string, t *template.Template, m [][]Metric) (str
 	}
 
 	return countersText + res.String(), nil
+}
+
+func FormatContainerMetrics(metrics []ContainerMetric) (string, error) {
+	format := `{{ .Name }}{gpu="{{.GPU}}",UUID="{{.GPUUUID}}",device="{{.GPUDevice}}",container="{{.Container}}",namespace="{{.Namespace}}",pod="{{.Pod}}"} {{.Value}}
+`
+	t := template.Must(template.New("metrics").Parse(format))
+	var res bytes.Buffer
+	// metrics = []ContainerMetric{
+	// 	ContainerMetric{
+	// 		Name:      "DCGM_FI_DEV_SM_CLOCK",
+	// 		Value:     "1515",
+	// 		GPU:       "kxie",
+	// 		GPUUUID:   "GPU-de4b1bb0-3ec3-67ed-b3e2-c32d8546e818",
+	// 		GPUDevice: "nvidia0",
+	// 		Namespace: "default",
+	// 		Pod:       "nbody-pod",
+	// 		Container: "nbody",
+	// 	},
+
+	// 	ContainerMetric{
+	// 		Name:      "DCGM_FI_DEV_GPU_UTIL",
+	// 		Value:     "100",
+	// 		GPU:       "kxie",
+	// 		GPUUUID:   "GPU-de4b1bb0-3ec3-67ed-b3e2-c32d8546e818",
+	// 		GPUDevice: "nvidia0",
+	// 		Namespace: "default",
+	// 		Pod:       "nbody-pod",
+	// 		Container: "nbody",
+	// 	},
+	// }
+	for _, m := range metrics {
+		if err := t.Execute(&res, m); err != nil {
+			return "", err
+		}
+	}
+	return res.String(), nil
 }

@@ -47,6 +47,10 @@ func (p *PodMapper) Name() string {
 	return "podMapper"
 }
 
+func (p *PodMapper) K8sProcess() ([]ContainerMetric, error) {
+	return nil, nil
+}
+
 func (p *PodMapper) Process(metrics [][]Metric) error {
 	_, err := os.Stat(socketPath)
 	if os.IsNotExist(err) {
