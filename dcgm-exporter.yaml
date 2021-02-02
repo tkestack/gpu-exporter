@@ -55,6 +55,9 @@ spec:
         - name: cgroup
           readOnly: true
           mountPath: "/sys/fs/cgroup"
+        - name: proc
+          readOnly: true
+          mountPath: "/rootfs/proc"
       volumes:
       - name: "pod-gpu-resources"
         hostPath:
@@ -63,6 +66,10 @@ spec:
         hostPath:
           type: Directory
           path: "/sys/fs/cgroup"
+      - name: proc
+        hostPath:
+          type: Directory
+          path: "/proc"
 
 ---
 
