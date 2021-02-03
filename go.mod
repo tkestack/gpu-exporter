@@ -9,6 +9,9 @@ require (
 	github.com/urfave/cli/v2 v2.2.0
 	golang.org/x/sys v0.0.0-20200413165638-669c56c373c4 // indirect
 	google.golang.org/grpc v1.28.1
+	k8s.io/api v0.18.2
+	k8s.io/apimachinery v0.18.2
+	k8s.io/client-go v0.18.2
 	k8s.io/kubernetes v1.18.2
 )
 
