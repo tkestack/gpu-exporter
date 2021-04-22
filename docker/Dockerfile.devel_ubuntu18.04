@@ -1,0 +1,17 @@
+FROM nvidia/cuda:11.0-base-ubuntu18.04
+
+ARG DCGM_VERSION
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libcap2-bin \
+    libgomp1 \
+    wget && \
+    rm -rf /var/lib/apt/lists/* && \
+    wget --no-check-certificate https://developer.download.nvidia.com/compute/redist/dcgm/${DCGM_VERSION}/DEBS/datacenter-gpu-manager_${DCGM_VERSION}_amd64.deb && \
+    dpkg -i datacenter-gpu-manager_*.deb && \
+    rm -f datacenter-gpu-manager_*.deb
+
+# Required for DCP metrics
+ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility,compat32
+# disable all constraints on the configurations required by NVIDIA container toolkit
+ENV NVIDIA_DISABLE_REQUIRE="true"
+ENV NVIDIA_VISIBLE_DEVICES=all
