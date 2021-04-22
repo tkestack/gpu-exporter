@@ -10,6 +10,25 @@ Golang bindings are provided for the following two libraries:
 
 You will also find samples for both of these bindings in this repository.
 
+## New Feature
+
+This is based on [NVIDIA/gpu-monitoring-tools](https://github.com/NVIDIA/gpu-monitoring-tools). The original monitoring tools can only monitor specific NVIDIA GPU card, with the Kubernetes pods name listed which built by [NVIDIA/k8s-device-plugin](https://github.com/NVIDIA/k8s-device-plugin).
+
+This repository allows to monitor the utilization such as sm, dec, env and memory of Kubernetes pods and containers, which may be built by any third party of gpu device plugin. For example:
+
+```
+DCGM_FI_K8S_MEM_COPY_UTIL{gpu="0",UUID="GPU-de4b1bb0-3ec3-67ed-b3e2-c32d8546e818",device="nvidia0",container="benchmark-0",namespace="default",pod="benchmark-0"} 30
+DCGM_FI_K8S_ENC_UTIL{gpu="0",UUID="GPU-de4b1bb0-3ec3-67ed-b3e2-c32d8546e818",device="nvidia0",container="benchmark-0",namespace="default",pod="benchmark-0"} 0
+DCGM_FI_K8S_DEC_UTIL{gpu="0",UUID="GPU-de4b1bb0-3ec3-67ed-b3e2-c32d8546e818",device="nvidia0",container="benchmark-0",namespace="default",pod="benchmark-0"} 0
+DCGM_FI_K8S_GPU_UTIL{gpu="0",UUID="GPU-de4b1bb0-3ec3-67ed-b3e2-c32d8546e818",device="nvidia0",container="benchmark-0",namespace="default",pod="benchmark-0"} 47
+DCGM_FI_K8S_GPU_UTIL{gpu="0",UUID="GPU-de4b1bb0-3ec3-67ed-b3e2-c32d8546e818",device="nvidia0",container="benchmark-1",namespace="default",pod="benchmark-1"} 17
+DCGM_FI_K8S_MEM_COPY_UTIL{gpu="0",UUID="GPU-de4b1bb0-3ec3-67ed-b3e2-c32d8546e818",device="nvidia0",container="benchmark-1",namespace="default",pod="benchmark-1"} 10
+DCGM_FI_K8S_ENC_UTIL{gpu="0",UUID="GPU-de4b1bb0-3ec3-67ed-b3e2-c32d8546e818",device="nvidia0",container="benchmark-1",namespace="default",pod="benchmark-1"} 0
+DCGM_FI_K8S_DEC_UTIL{gpu="0",UUID="GPU-de4b1bb0-3ec3-67ed-b3e2-c32d8546e818",device="nvidia0",container="benchmark-1",namespace="default",pod="benchmark-1"} 0
+```
+
+Above outputs the utilization of all Kubernetes pods and containers run by some other K8S device plugin for GPU sharing.
+
 ## DCGM-Exporter
 
 The repository also contains DCGM-Exporter. It exposes GPU metrics exporter for [Prometheus](https://prometheus.io/) leveraging [NVIDIA DCGM](https://developer.nvidia.com/dcgm).
