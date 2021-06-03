@@ -38,7 +38,7 @@ spec:
       nodeSelector:
         nvidia-device-enable: "enable"
       containers:
-      - image: "dcgm-exporter:2.0.13-2.1.1-ubuntu18.04"
+      - image: "ccr.ccs.tencentyun.com/keyangxie/nvidia-dcgm-exporter:2.0.13-2.1.1-ubuntu18.04"
         env:
         - name: "DCGM_EXPORTER_LISTEN"
           value: ":9400"
