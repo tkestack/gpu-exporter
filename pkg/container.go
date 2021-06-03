@@ -30,7 +30,6 @@ import (
 
 	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -129,16 +128,9 @@ func (c *CgroupMapper) Process(metrics [][]Metric) error {
 
 func (c *CgroupMapper) getPodInfo() (map[ContainerKey]ContainerInfo, error) {
 	logrus.Infof("Get Pod and Container Information")
-	nodeName := os.Getenv("NODE_NAME")
-	if nodeName == "" {
-		logrus.Infof("Failed to get node name")
-		return nil, fmt.Errorf("Failed to get node name")
-	}
-	selector := fields.SelectorFromSet(fields.Set{"spec.nodeName": nodeName})
 
 	ctx, _ := context.WithCancel(context.Background())
 	podList, err := c.K8sClient.CoreV1().Pods(v1.NamespaceAll).List(ctx, metav1.ListOptions{
-		FieldSelector:   selector.String(),
 		LabelSelector:   labels.Everything().String(),
 		ResourceVersion: "0",
 	})
