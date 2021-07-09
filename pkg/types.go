@@ -25,7 +25,7 @@ import (
 	"github.com/NVIDIA/gpu-monitoring-tools/bindings/go/dcgm"
 
 	"k8s.io/client-go/informers"
-	"k8s.io/client-go/kubernetes"
+	v1lister "k8s.io/client-go/listers/core/v1"
 )
 
 var (
@@ -147,7 +147,7 @@ type PodInfo struct {
 
 type CgroupMapper struct {
 	DeviceList []dcgm.Device
-	K8sClient  *kubernetes.Clientset
+	PodLister  v1lister.PodLister
 	// SharedInformers gives access to informers for the controller.
 	SharedInformers informers.SharedInformerFactory
 }
